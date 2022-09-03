@@ -1,0 +1,154 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QRadioButton, QGroupBox, QButtonGroup
+from random import *
+class Nobody():
+    def __init__(self,move,right):
+       self.move = move
+       self.right = right
+    def right_answer(self,r):
+        self.right = r
+class Question():
+    def __init__(self,question,right_answer,wrong1,wrong2,wrong3):
+        self.question = question
+        self.right_answer = right_answer
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+N = Nobody(1,0)
+def show_result():
+    group.hide()
+    group1.show()
+    answer.setText('Следущий вопрос')
+    N.move += 1
+def show_question():
+    group1.hide()
+    RadioGroup.setExclusive(False)
+    Radio.setChecked(False)
+    Radio1.setChecked(False)
+    Radio2.setChecked(False)
+    Radio3.setChecked(False)
+    RadioGroup.setExclusive(True)
+    group.show()
+    answer.setText('Ответить')
+    N.move -= 1
+def ask(q):
+    shuffle(ButtonsList)
+    cp.setText(q.question)
+    ButtonsList[0].setText(q.right_answer)
+    ButtonsList[1].setText(q.wrong1)
+    ButtonsList[2].setText(q.wrong2)
+    ButtonsList[3].setText(q.wrong3)
+    N.right_answer(q.right_answer)
+def check_answer():
+    if ButtonsList[0].isChecked():
+        window.score += 1
+        Label.setText('Правильно')
+        Label1.setText(N.right)
+    else:
+        Label.setText('Неправильно')
+        Label1.setText(N.right)
+    print('Статистика')
+    print("Всего -", window.total)
+    print("Счёт -", window.score)
+    window.result = int(window.score / window.total * 100)
+    window.result1 = str(window.result) + '%'
+    print("Рейтинг -", window.result1)
+    Label3.setText(window.result1)
+    show_result()
+def next_question():
+    window.cur_question += 1
+    window.total += 1
+    if window.cur_question == len(question_list):
+        window.cur_question = 0
+    cur_question = randint(0,len(question_list)-1)
+    ask(question_list[cur_question])
+    answer.setText('Ответить')
+    if N.move == 0:
+        check_answer()
+    elif N.move == 1:
+        show_question()
+def choice_move():
+    if N.move == 0:
+        check_answer()
+    elif N.move == 1:
+        next_question()
+app = QApplication([])
+window = QWidget()
+window.score = 0
+window.total = 0
+window.cur_question = -1
+window.result = 0
+window.result1 = ''
+group = QGroupBox('Варианты ответа')
+group1 = QGroupBox('Варианты ответа')
+Label = QLabel('Правильно/Неправильно')
+Label3 = QLabel('')
+Label1 = QLabel('Правильно')
+
+window.setWindowTitle('Memory card')
+
+question_list = []
+question_list.append(Question('Какой национальности не существует:', 'intel(R) 5', 'Русский', 'Украинец', 'Беларус'))
+question_list.append(Question('Какой страны не существует:', 'Южный узбекистан', 'Эквадор', 'Украина', 'Южная осетия'))
+question_list.append(Question('Когда началась 2 мировая война:', '1939', '1941', '1943', '1945'))
+question_list.append(Question('Самый вкусный сырок:', 'Б.Ю Александров', 'Творобушки', 'Каждый день', 'Чудо'))
+question_list.append(Question('Какая страна была зависима от великобритании:', 'Канада', 'Китай', 'Япония', 'Россия'))
+question_list.append(Question('Какое животное существует:', 'Синекольчатый осьминог', 'Плавниковый червь', 'Глубоководная голубая стерлядь', 'Рак общественник'))
+question_list.append(Question('Какого животного не существует:', 'Лачили', 'Переднеазиатский леопард', 'Архар', 'Сайгак'))
+question_list.append(Question('Худшая операционная система:', 'Windows', 'Mac OS', 'Linux', 'Raspberry'))
+question_list.append(Question('Прожиточный минимум в России:', '20000руб', '25000руб', '15000руб', '5000руб'))
+question_list.append(Question('Когда были введены первые санкции против России:', '2014', '2010', '2016', '2022'))
+
+cp = QLabel('Какой национальности не существует:')
+
+Radio = QRadioButton('Русский')
+Radio1 = QRadioButton('Украинец')
+Radio2 = QRadioButton('Беларус')
+Radio3 = QRadioButton('intel(R) 5')
+
+ButtonsList = [Radio,Radio1,Radio2,Radio3]
+
+RadioGroup = QButtonGroup()
+RadioGroup.addButton(Radio)
+RadioGroup.addButton(Radio1)
+RadioGroup.addButton(Radio2)
+RadioGroup.addButton(Radio3)
+
+answer = QPushButton('Ответить')
+next_question()
+group.show()
+answer.clicked.connect(choice_move)
+h_line = QHBoxLayout()
+h_line.addWidget(cp, alignment = Qt.AlignCenter)
+
+h_line1 = QHBoxLayout()
+h_line1.addWidget(Radio, alignment = Qt.AlignCenter)
+h_line1.addWidget(Radio1, alignment = Qt.AlignCenter)
+
+h_line2 = QHBoxLayout()
+h_line2.addWidget(Radio2, alignment = Qt.AlignCenter)
+h_line2.addWidget(Radio3, alignment = Qt.AlignCenter)
+
+buttons = QVBoxLayout()
+buttons.addLayout(h_line1)
+buttons.addLayout(h_line2)
+
+group.setLayout(buttons)
+
+v_line1 = QVBoxLayout()
+v_line1.addWidget(cp, alignment = Qt.AlignCenter)
+v_line1.addWidget(group, alignment = Qt.AlignCenter)
+v_line1.addWidget(group1, alignment = Qt.AlignCenter)
+group1.hide()
+v_line1.addWidget(answer, alignment = Qt.AlignCenter)
+
+v_line2 = QVBoxLayout()
+v_line2.addWidget(Label, alignment = Qt.AlignLeft)
+v_line2.addWidget(Label1, alignment = Qt.AlignCenter)
+v_line2.addWidget(Label3, alignment = Qt.AlignRight)
+
+group1.setLayout(v_line2)
+
+window.setLayout(v_line1)
+window.show()
+app.exec_()
